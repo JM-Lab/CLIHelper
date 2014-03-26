@@ -52,18 +52,19 @@ public class RunCLISimple implements RunCLI {
 			return process.waitFor() == 0 ? checkError:false;
 			
 		} catch (IOException e) {
-			occurProcessExceptions(e);
-			return false;
+			return occurProcessExceptions(e);
+			
 		} catch (InterruptedException e) {
-			occurProcessExceptions(e);
-			return false;
+			return occurProcessExceptions(e);
+			
 		}
 	}
 
-	private void occurProcessExceptions(Exception e) {
+	private boolean occurProcessExceptions(Exception e) {
 		checkError = false;
 		e.printStackTrace();
 		logger.fatal(e.getMessage());
+		return false;
 	}
 
 	protected void stdOutAndErr(BufferedReader stdOut, BufferedReader stdErr)
