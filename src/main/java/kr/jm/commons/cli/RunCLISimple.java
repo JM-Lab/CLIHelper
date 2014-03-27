@@ -3,7 +3,9 @@ package kr.jm.commons.cli;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Iterator;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 public class RunCLISimple implements RunCLI {
@@ -18,9 +20,9 @@ public class RunCLISimple implements RunCLI {
 
 	protected Map<String, String> environment;
 
-	protected void runInit(String command) {
+	protected void runInit(List<String> command) {
 
-		processBuilder = new ProcessBuilder(command.split(" "));
+		processBuilder = new ProcessBuilder(command);
 
 		if (environment != null && environment.size() > 0) {
 			processBuilder.environment().putAll(environment);
@@ -31,9 +33,9 @@ public class RunCLISimple implements RunCLI {
 		checkError = true;
 	}
 
-	public boolean run(String command) {
+	public boolean run(List<String> command) {
 
-		logger.info("Command: " + command);
+		logger.info("Command: " + buildStringCommand(command));
 
 		runInit(command);
 
@@ -48,16 +50,33 @@ public class RunCLISimple implements RunCLI {
 					process.getErrorStream()));
 
 			stdOutAndErr(stdOut, stdErr);
-			
-			return process.waitFor() == 0 ? checkError:false;
-			
+
+			return process.waitFor() == 0 ? checkError : false;
+
 		} catch (IOException e) {
 			return occurProcessExceptions(e);
-			
+
 		} catch (InterruptedException e) {
 			return occurProcessExceptions(e);
-			
+
 		}
+	}
+
+	private String buildStringCommand(List<String> command) {
+		if(command==null||command.size()==0){
+			return "";
+		}
+		
+		StringBuilder sb = new StringBuilder(command.get(0));
+		for (int i = 1; i < command.size() ; i++) {
+			sb.append(' ');
+			sb.append(command.get(i));
+		}
+		return sb.toString();
+	}
+
+	public boolean run(String command) {
+		return run(Arrays.asList(command.split(" ")));
 	}
 
 	private boolean occurProcessExceptions(Exception e) {
@@ -77,7 +96,7 @@ public class RunCLISimple implements RunCLI {
 
 		while ((resultLine = stdErr.readLine()) != null) {
 			writeErrLog(resultLine);
-			
+
 		}
 	}
 
