@@ -12,7 +12,7 @@ Checkout the source code:
     mvn install
 
 ## Usage
-Set up Maven POM file :
+Set up pom.xml :
 
     (...)
     <dependency>
